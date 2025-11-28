@@ -4,19 +4,22 @@
     <meta charset="UTF-8">
     <title>Feedback Display</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
 <style>
 .fixed-card {
     height: 550px;
     overflow-y: auto;
     border-radius: 15px;
-    background-color: rgb(188, 120, 120); 
+    background-color: rgb(188, 120, 120);
 }
+
 .fixed-image {
     height: 180px;
     width: 100%;
     object-fit: cover;
     border-radius: 10px;
 }
+
 .fixed-video {
     height: 180px;
     width: 100%;
@@ -24,6 +27,7 @@
 }
 </style>
 </head>
+
 <body style="background-color: rgb(240, 159, 159);">
 
 <h2 class="text-center mt-4">All Feedback</h2>
@@ -33,54 +37,62 @@
 </div>
 
 <div class="text-center mt-3">
-    <button class="btn btn-danger" onclick="clear()">Clear All Feedback</button>
+    <button class="btn btn-danger" onclick="clearFeedback()">Clear All Feedback</button>
 </div>
 
 <script>
-let data=JSON.parse(localStorage.getItem("testimonials")) || [];
-let container=document.getElementById("feedback");
+let data = JSON.parse(localStorage.getItem("testimonials")) || [];
+let container = document.getElementById("feedback");
 
-function getEmbedURL(link){
-    if(!link) return "";
+// Convert different video URLs to embed form
+function getEmbedURL(link) {
+    if (!link) return "";
 
-    if(link.includes("watch?v=")){
+    // Normal YouTube URL
+    if (link.includes("watch?v=")) {
         return link.replace("watch?v=", "embed/");
     }
-    if(link.includes("youtu.be")){
+
+    // Short YouTube URL
+    if (link.includes("youtu.be")) {
         let id = link.split("youtu.be/")[1];
-        return "https://www.youtube.com/embed/"+id;
+        if (id.includes("?")) id = id.split("?")[0];
+        return "https://www.youtube.com/embed/" + id;
     }
-    if(link.includes("drive.google.com")){
+
+    // Google Drive
+    if (link.includes("drive.google.com")) {
         return link.replace("view?usp=sharing", "preview");
     }
+
     return link;
 }
 
-data.forEach(t =>{
-    let videoEmbed=getEmbedURL(t.video);
+data.forEach(t => {
+    let videoEmbed = getEmbedURL(t.video);
 
-    container.innerHTML+=`
-    <div class="col-md-4">
-        <div class="card p-3 shadow fixed-card">
+    container.innerHTML += `
+        <div class="col-md-4">
+            <div class="card p-3 shadow fixed-card">
 
-            <h5>${t.name}</h5>
-            <p><strong>Email:</strong> ${t.email}</p>
-            <p><strong>Phone:</strong> ${t.phone}</p>
-            <p><strong>Department:</strong> ${t.department}</p>
-            <p><strong>Year:</strong> ${t.year}</p>
-            <p><strong>Rating:</strong> ${t.rating}</p>
-            <p><strong>Feedback:</strong> ${t.message}</p>
+                <h5>${t.name}</h5>
+                <p><strong>Email:</strong> ${t.email}</p>
+                <p><strong>Phone:</strong> ${t.phone}</p>
+                <p><strong>Department:</strong> ${t.department}</p>
+                <p><strong>Year:</strong> ${t.year}</p>
+                <p><strong>Rating:</strong> ${t.rating}</p>
+                <p><strong>Feedback:</strong> ${t.message}</p>
 
-            ${t.image ? `<img src="${t.image}" class="fixed-image mt-2">` : ""}
+                ${t.image ? `<img src="${t.image}" class="fixed-image mt-2">` : ""}
 
-            ${t.video ? 
-                `<iframe class="fixed-video mt-2" src="${videoEmbed}" frameborder="0" allowfullscreen></iframe>`
-            : ""}
-        </div>
-    </div>`;
+                ${t.video ? 
+                    `<iframe class="fixed-video mt-2" src="${videoEmbed}" frameborder="0" allowfullscreen></iframe>`
+                : ""}
+            </div>
+        </div>`;
 });
 
-function clear() {
+function clearFeedback() {
     if (confirm("Are you sure you want to delete all feedback?")) {
         localStorage.removeItem("testimonials");
         location.reload();
